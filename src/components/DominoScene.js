@@ -161,7 +161,7 @@ const ResponsiveInstagramReel = () => {
               transition={{ duration: 0.5 }}
               className="relative z-10 text-center mt-16 sm:mt-20 md:mt-24"
             >
-              <h2 className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 ${currentScene.accent} text-transparent bg-clip-text`}>
+              <h2 className={`text-2xl p-4 sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 ${currentScene.accent} text-transparent bg-clip-text`}>
                 {currentScene.subtitle}
               </h2>
               <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-300 mb-4 sm:mb-5 md:mb-6 px-2 sm:px-4">
