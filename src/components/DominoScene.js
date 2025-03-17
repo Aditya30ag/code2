@@ -14,7 +14,6 @@ import { motion, AnimatePresence } from "framer-motion";
 // Configuration Constants
 const SCENE_DURATION = 5000; // Slightly longer for better readability
 const PARTICLE_COUNT = 400; // More particles for richer visual experience
-const GRADIENT_TRANSITION_SPEED = 2; // Controls the gradient animation speed
 
 // Enhanced Scene Data with More Dynamic Options
 const SCENES = [
@@ -100,39 +99,11 @@ const SCENES = [
   },
 ];
 
-// Enhanced 3D Scene Component
-const Scene3D = ({ title, color }) => (
-  <Center>
-    <ambientLight intensity={0.5} />
-    <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
-    <Float speed={1.8} rotationIntensity={0.5} floatIntensity={1.2}>
-      <Text3D
-        font="https://threejs.org/examples/fonts/helvetiker_bold.typeface.json"
-        size={0.7}
-        height={0.2}
-        curveSegments={64}
-        bevelEnabled
-        bevelThickness={0.04}
-        bevelSize={0.03}
-        bevelSegments={12}
-      >
-        {title}
-        <meshStandardMaterial 
-          color={color} 
-          metalness={0.9} 
-          roughness={0.1} 
-          emissive={color}
-          emissiveIntensity={0.2}
-        />
-      </Text3D>
-    </Float>
-  </Center>
-);
 
 // Enhanced IconRow with Motion Effects
 const IconRow = ({ iconColor, scene }) => {
   const icons = [Building2, MapPin, Languages, Clock, Users];
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -146,30 +117,32 @@ const IconRow = ({ iconColor, scene }) => {
           key={i}
           initial={{ scale: 0, opacity: 0, rotate: -10 }}
           animate={{ scale: 1, opacity: 1, rotate: 0 }}
-          transition={{ 
-            delay: 0.7 + i * 0.15, 
+          transition={{
+            delay: 0.7 + i * 0.15,
             duration: 0.4,
             type: "spring",
-            stiffness: 200
+            stiffness: 200,
           }}
-          className={`relative p-2 sm:p-3 bg-black/70 rounded-full border border-${scene.gradientFrom.split('-')[1]}-500/50 backdrop-blur-xl shadow-lg`}
+          className={`relative p-2 sm:p-3 bg-black/70 rounded-full border border-${
+            scene.gradientFrom.split("-")[1]
+          }-500/50 backdrop-blur-xl shadow-lg`}
         >
           <Icon
             className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 ${iconColor}`}
           />
-          <motion.div 
+          <motion.div
             className="absolute inset-0 rounded-full"
-            animate={{ 
+            animate={{
               boxShadow: [
                 `0 0 0px ${scene.particles.color}`,
                 `0 0 8px ${scene.particles.color}`,
-                `0 0 0px ${scene.particles.color}`
-              ]
+                `0 0 0px ${scene.particles.color}`,
+              ],
             }}
-            transition={{ 
-              duration: 2, 
+            transition={{
+              duration: 2,
               repeat: Infinity,
-              repeatType: "reverse" 
+              repeatType: "reverse",
             }}
           />
         </motion.div>
@@ -213,7 +186,7 @@ const ProgressIndicator = ({ currentIndex, total }) => (
         key={i}
         animate={{
           width: i === currentIndex ? "2rem" : "0.5rem",
-          backgroundColor: i === currentIndex ? "#22d3ee" : "#4b5563"
+          backgroundColor: i === currentIndex ? "#22d3ee" : "#4b5563",
         }}
         transition={{ duration: 0.3 }}
         className="h-1 sm:h-2 rounded-full transition-all duration-300"
@@ -229,42 +202,33 @@ const DominoScene = () => {
   const [direction, setDirection] = useState(1); // 1 for forward, -1 for backward
   const intervalRef = useRef(null);
   const currentScene = SCENES[sceneIndex];
-
-  const startAutoPlay = () => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(() => {
-      setSceneIndex((prev) => {
-        const nextIndex = (prev + direction) % SCENES.length;
-        return nextIndex < 0 ? SCENES.length - 1 : nextIndex;
-      });
-    }, SCENE_DURATION);
-  };
-
+  const [gradientIndex, setGradientIndex] = useState(0);
   useEffect(() => {
-    if (isAutoPlaying) {
-      startAutoPlay();
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isAutoPlaying, direction]);
+    const interval = setInterval(() => {
+      setSceneIndex((prev) => (prev + 1) % SCENES.length);
+      setGradientIndex((prevIndex) => (prevIndex + 1) % gradientOptions.length);
+    }, SCENE_DURATION);
+    return () => clearInterval(interval);
+  }, []);
 
+  const gradientOptions = [
+    "bg-gradient-to-r from-cyan-400 to-blue-600",
+    "bg-gradient-to-r from-violet-500 to-amber-400",
+    "bg-gradient-to-r from-amber-400 to-purple-600",
+  ];
 
+  const currentAccent = gradientOptions[gradientIndex];
   return (
     <div className="flex justify-center min-w-screen items-center min-h-screen bg-gray-900">
-      
       <div
         className="relative w-full sm:max-w-sm md:max-w-md mx-auto min-h-screen bg-black overflow-hidden shadow-xl rounded-lg"
         style={{ aspectRatio: "9/16" }}
       >
-        
-
-
-
         <div className="absolute inset-0 opacity-40">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-violet-600 via-transparent to-transparent animate-pulse"></div>
           <div className="absolute bottom-0 right-0 w-full h-full bg-gradient-to-tl from-cyan-400 via-transparent to-transparent animate-pulse"></div>
         </div>
+
         {/* Content Layer */}
         <AnimatePresence mode="wait">
           <motion.div
@@ -282,18 +246,17 @@ const DominoScene = () => {
                 animate={{ opacity: 0.25 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1 }}
-                className={`absolute inset-0 ${currentScene.accent}`}
+                className={`absolute inset-0 ${currentAccent}`}  
               />
               <div className="absolute inset-0 backdrop-blur-xl" />
             </div>
-              
 
             {/* Main Content with Enhanced Animation */}
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.7, delay: 0.3 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
               className="relative z-10 text-center mt-16 sm:mt-20 md:mt-24"
             >
               <motion.div
@@ -302,13 +265,12 @@ const DominoScene = () => {
                     `0 0 8px ${currentScene.particles.color}`,
                     `0 0 16px ${currentScene.particles.color}`,
                     `0 0 8px ${currentScene.particles.color}`,
-                  ]
+                  ],
                 }}
                 transition={{
                   duration: 2,
-                  repeat: Infinity
+                  repeat: Infinity,
                 }}
-
               >
                 <h2
                   className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight p-4 bg-gradient-to-r ${currentScene.gradientFrom} ${currentScene.gradientVia} ${currentScene.gradientTo} text-transparent bg-clip-text drop-shadow-lg`}
@@ -316,8 +278,8 @@ const DominoScene = () => {
                   {currentScene.subtitle}
                 </h2>
               </motion.div>
-              
-              <motion.p 
+
+              <motion.p
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6, duration: 0.7 }}
@@ -325,29 +287,26 @@ const DominoScene = () => {
               >
                 {currentScene.description}
               </motion.p>
-              
+
               {/* Dynamic glowing accent line */}
-              <motion.div 
+              <motion.div
                 className="w-16 h-1 mx-auto rounded-full"
                 style={{ backgroundColor: currentScene.particles.color }}
-                animate={{ 
+                animate={{
                   width: ["4rem", "6rem", "4rem"],
                   boxShadow: [
                     `0 0 5px ${currentScene.particles.color}`,
-                    `0 0 15px ${currentScene.particles.color}`, 
-                    `0 0 5px ${currentScene.particles.color}`
-                  ]
+                    `0 0 15px ${currentScene.particles.color}`,
+                    `0 0 5px ${currentScene.particles.color}`,
+                  ],
                 }}
                 transition={{
                   duration: 2,
                   repeat: Infinity,
-                  repeatType: "reverse"
+                  repeatType: "reverse",
                 }}
               />
             </motion.div>
-
-
-            
 
             {/* Bottom Elements */}
             <IconRow iconColor={currentScene.iconColor} scene={currentScene} />
@@ -356,27 +315,6 @@ const DominoScene = () => {
               total={SCENES.length}
               currentScene={currentScene}
             />
-            
-            {/* Auto-play toggle */}
-            <motion.button
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 0.7, y: 0 }}
-              whileHover={{ opacity: 1, scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/40 flex items-center justify-center backdrop-blur-sm border border-white/10 z-20"
-            >
-              {isAutoPlaying ? (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              )}
-            </motion.button>
           </motion.div>
         </AnimatePresence>
 
