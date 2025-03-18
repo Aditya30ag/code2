@@ -262,9 +262,9 @@ const DominoScene = () => {
               <motion.div
                 animate={{
                   textShadow: [
+                    `0 0 4px ${currentScene.particles.color}`,
                     `0 0 8px ${currentScene.particles.color}`,
-                    `0 0 16px ${currentScene.particles.color}`,
-                    `0 0 8px ${currentScene.particles.color}`,
+                    `0 0 4px ${currentScene.particles.color}`,
                   ],
                 }}
                 transition={{
